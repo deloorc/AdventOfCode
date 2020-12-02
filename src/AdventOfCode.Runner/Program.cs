@@ -33,12 +33,10 @@ switch (day)
             var input = File.ReadAllLines(path);
 
             // Part #1
-            var passwordPhilosophy = new PasswordPhilosophy(input, CompanyPolicy.SledRental);
-            Console.WriteLine(passwordPhilosophy.Validate().ToString());
+            Console.WriteLine(new PasswordPhilosophy(input).PartOne().ToString());
 
             // Part #2
-            passwordPhilosophy = new PasswordPhilosophy(input, CompanyPolicy.Toboggan);
-            Console.WriteLine(passwordPhilosophy.Validate().ToString());
+            Console.WriteLine(new PasswordPhilosophy(input).PartTwo().ToString());
             break;
         }
     default:

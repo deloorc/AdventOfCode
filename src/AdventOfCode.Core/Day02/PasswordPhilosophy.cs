@@ -7,45 +7,32 @@ namespace AdventOfCode.Core.Day02
     public class PasswordPhilosophy
     {
         private readonly IEnumerable<string> _input;
-        private readonly Func<PasswordPolicy, bool> _predicate;
 
-        private record PasswordPolicy(int min, int max, char letter, string password);
+        private record PasswordPolicy(int Min, int Max, char Letter, string Password);
 
-        public PasswordPhilosophy(IEnumerable<string> input, CompanyPolicy policy)
+        public PasswordPhilosophy(IEnumerable<string> input) => _input = input ?? throw new ArgumentNullException(nameof(input));
+
+        public int PartOne() => Parse(_input).Count(policy =>
         {
-            _input = input;
-            switch (policy)
+            var count = policy.Password.Count(c => c.Equals(policy.Letter));
+            return count >= policy.Min && count <= policy.Max;
+        });
+
+        public int PartTwo() => Parse(_input).Count(policy =>
+        {
+            if (policy.Password.Length < policy.Max)
             {
-                case CompanyPolicy.Toboggan:
-                    _predicate = policy =>
-                    {
-                        if (policy.password.Length < policy.max)
-                        {
-                            return false;
-                        }
-
-                        return (policy.password[policy.min - 1] == policy.letter) ^ (policy.password[policy.max - 1] == policy.letter);
-                    };
-                    break;
-                case CompanyPolicy.SledRental:
-                    _predicate = policy =>
-                    {
-                        var count = policy.password.Count(c => c.Equals(policy.letter));
-                        return count >= policy.min && count <= policy.max;
-                    };
-                    break;
-                default:
-                    throw new ArgumentException(nameof(policy));
+                return false;
             }
-        }
 
-        public int Validate() => Parse(_input).Count(_predicate);
+            return (policy.Password[policy.Min - 1] == policy.Letter) ^ (policy.Password[policy.Max - 1] == policy.Letter);
+        });
 
         private static IEnumerable<PasswordPolicy> Parse(IEnumerable<string> input)
         {
             foreach (var entry in input)
             {
-                var parts = entry.Split(' ', StringSplitOptions.TrimEntries);
+                var parts = entry.Split(' ');
                 var range = parts[0].Split('-').Select(int.Parse).ToArray();
                 var letter = parts[1].First();
                 var password = parts[2];
@@ -53,6 +40,5 @@ namespace AdventOfCode.Core.Day02
                 yield return new PasswordPolicy(range[0], range[1], letter, password);
             }
         }
-
     }
 }
