@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using AdventOfCode.Core.Day01;
 using AdventOfCode.Core.Day02;
+using AdventOfCode.Core.Day03;
 using Microsoft.Extensions.Configuration;
 
 var config = new ConfigurationBuilder().AddCommandLine(args, new Dictionary<string, string> { { "-d", "day" } }).Build();
@@ -37,6 +38,25 @@ switch (day)
 
             // Part #2
             Console.WriteLine(new PasswordPhilosophy(input).PartTwo().ToString());
+            break;
+        }
+    case 3:
+        {
+            var input = File.ReadLines(path);
+
+            // Part #1
+            Console.WriteLine(new TobogganTrajectory(input).AnalyseTrees(right: 3, down: 1).ToString());
+
+            // Part #2
+            Console.WriteLine(new TobogganTrajectory(input).AnalyseTrees(new (int right, int down)[]
+            {
+                (right: 1, down: 1),
+                (right: 3, down: 1),
+                (right: 5, down: 1),
+                (right: 7, down: 1),
+                (right: 1, down: 2)
+            }).ToString());
+
             break;
         }
     default:
