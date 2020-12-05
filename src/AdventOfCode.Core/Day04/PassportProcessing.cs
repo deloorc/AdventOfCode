@@ -22,16 +22,15 @@ namespace AdventOfCode.Core.Day04
         private readonly string[] _input;
 
         public PassportProcessing(string[] input)
-        {
-            _input = input ?? throw new ArgumentNullException(nameof(input));
-        }
+            => _input = input ?? throw new ArgumentNullException(nameof(input));
 
-        public int AnalysePassports() => ScanPassports().Count(passport => ValidateRequiredFields(passport));
+        public int AnalysePassports()
+            => ScanPassports()
+                .Count(passport => ValidateRequiredFields(passport));
 
         public int AnalysePassportsWithRules()
-        {
-            return ScanPassports().Count(passport => ValidateRequiredFields(passport) && ValidateFieldRules(passport));
-        }
+            => ScanPassports()
+                .Count(passport => ValidateRequiredFields(passport) && ValidateFieldRules(passport));
 
         private IEnumerable<IReadOnlyDictionary<string, string>> ScanPassports()
         {
@@ -56,23 +55,22 @@ namespace AdventOfCode.Core.Day04
             }
         }
 
-        private bool ValidateRequiredFields(IReadOnlyDictionary<string, string> passport)
-        {
-            return _requiredFields.All(field => passport.ContainsKey(field));
-        }
+        private static bool ValidateRequiredFields(IReadOnlyDictionary<string, string> passport)
+            => _requiredFields
+                .All(field => passport.ContainsKey(field));
 
-        private bool ValidateFieldRules(IReadOnlyDictionary<string, string> passport)
+        private static bool ValidateFieldRules(IReadOnlyDictionary<string, string> passport)
         {
             foreach (var (field, value) in passport)
             {
                 var flag = field switch
                 {
-                    "byr" => Range(value, @"[0-9]{4}", 1920, 2002),
-                    "iyr" => Range(value, @"[0-9]{4}", 2010, 2020),
-                    "eyr" => Range(value, @"[0-9]{4}", 2020, 2030),
-                    "hgt" => Range(value, @"([0-9]{3})cm", 150, 193) || Range(value, @"([0-9]{2})in", 59, 76),
+                    "byr" => int.TryParse(value, out var byr) && byr is >= 1920 and <= 2002,
+                    "iyr" => int.TryParse(value, out var iyr) && iyr is >= 2010 and <= 2020,
+                    "eyr" => int.TryParse(value, out var eyr) && eyr is >= 2020 and <= 2030,
+                    "hgt" => Regex.Match(value, @"((1[5-8][0-9]|19[0-3])cm)|(7[0-6]|59|6[0-9])in").Success,
                     "hcl" => Regex.Match(value, @"^#[0-9a-f]{6}$").Success,
-                    "ecl" => "amb blu brn gry grn hzl oth".Split(" ").Contains(value),
+                    "ecl" => Regex.Match(value, @"(amb|blu|brn|gry|grn|hzl|oth)").Success,
                     "pid" => Regex.Match(value, @"^[0-9]{9}$").Success,
                     "cid" => true,
                     _ => false
@@ -85,18 +83,6 @@ namespace AdventOfCode.Core.Day04
             }
 
             return true;
-
-            static bool Range(string st, string pattern, int min, int max)
-            {
-                var m = Regex.Match(st, "^" + pattern + "$");
-                if (m.Success is false)
-                {
-                    return false;
-                }
-
-                var v = int.Parse(m.Groups[^1].Value);
-                return v >= min && v <= max;
-            }
         }
     }
 }
