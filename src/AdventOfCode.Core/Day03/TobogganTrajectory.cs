@@ -8,33 +8,69 @@ namespace AdventOfCode.Core.Day03
     {
         private const char TreeSymbol = '#';
 
-        private readonly string[] _map;
+        private readonly IEnumerable<string> _map;
 
-        public TobogganTrajectory(IEnumerable<string> map)
-            => _map = map.ToArray() ?? throw new ArgumentNullException(nameof(map));
+        public TobogganTrajectory(IEnumerable<string> map) => _map = map ?? throw new ArgumentNullException(nameof(map));
 
-        public int AnalyseTrees(int right, int down)
+        public int AnalyseMap(int right, int down)
         {
-            var treeCount = 0;
-            var col = 0;
+            if (down is 0) 
+                throw new ArgumentOutOfRangeException(nameof(down));
 
-            for (int row = down; row < _map.Length; row += down)
+            var map = _map switch
             {
-                var area = _map[row];
+                string[] => (string[])_map,
+                _ => _map.ToArray()
+            };
 
-                col = (col + right) % area.Length;
-                if (area[col] is TreeSymbol)
-                {
+            // NOTE: index should be one-based in order to correctly calculate the 'symbol' index in the map line.
+            // NOTE: assumption that each line has the same length!
+            var (row, index, length, treeCount) = (down, 1, map[0].Length, 0);
+            for (; row < map.Length; row += down, index++)
+                if (map[row][(index * right) % length] is TreeSymbol)
                     treeCount++;
-                }
-            }
 
             return treeCount;
         }
 
-        public long AnalyseTrees(IReadOnlyList<(int right, int down)> slopes)
-            => slopes
-            .Select(slope => AnalyseTrees(slope.right, slope.down))
+        public long AnalyseMap(IReadOnlyList<(int right, int down)> slopes)
+         => slopes
+             .Select(slope => AnalyseMap(slope.right, slope.down))
+             .Aggregate(1L, (result, count) => result * count);
+
+        public int AnalyseMapSequence(int right, int down)
+        {
+            if (down is 0) 
+                throw new ArgumentOutOfRangeException(nameof(down));
+
+            using var enumerator = _map.GetEnumerator();
+            if (enumerator.MoveNext() is false)
+                return default;
+
+            // NOTE: assumption that each line has the same length!
+            var (treeCount, index, length) = (0, 0, enumerator.Current.Length);
+            while (Move(enumerator, down))
+                if (enumerator.Current[(right * ++index) % length] is TreeSymbol)
+                    treeCount++;
+
+            return treeCount;
+
+            static bool Move(in IEnumerator<string> enumerator, int skip)
+            {
+                // NOTE: 'shorter' # code lines.
+                // do if (enumerator.MoveNext() is false) return false; while (--skip > 0);
+
+                for (; skip > 0; --skip)
+                    if (enumerator.MoveNext() is false)
+                        return false;
+
+                return true;
+            }
+        }
+
+        public long AnalyseMapSequence(IReadOnlyList<(int right, int down)> slopes)
+        => slopes
+            .Select(slope => AnalyseMapSequence(slope.right, slope.down))
             .Aggregate(1L, (result, count) => result * count);
     }
 }

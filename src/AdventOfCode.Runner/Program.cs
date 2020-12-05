@@ -45,10 +45,10 @@ switch (day)
             var input = File.ReadLines(path);
 
             // Part #1
-            Console.WriteLine(new TobogganTrajectory(input).AnalyseTrees(right: 3, down: 1).ToString());
+            Console.WriteLine(new TobogganTrajectory(input).AnalyseMapSequence(right: 3, down: 1).ToString());
 
             // Part #2
-            Console.WriteLine(new TobogganTrajectory(input).AnalyseTrees(new (int right, int down)[]
+            Console.WriteLine(new TobogganTrajectory(input).AnalyseMapSequence(new (int right, int down)[]
             {
                 (right: 1, down: 1),
                 (right: 3, down: 1),
