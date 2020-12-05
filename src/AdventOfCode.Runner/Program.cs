@@ -5,6 +5,7 @@ using System.Linq;
 using AdventOfCode.Core.Day01;
 using AdventOfCode.Core.Day02;
 using AdventOfCode.Core.Day03;
+using AdventOfCode.Core.Day04;
 using Microsoft.Extensions.Configuration;
 
 var config = new ConfigurationBuilder().AddCommandLine(args, new Dictionary<string, string> { { "-d", "day" } }).Build();
@@ -56,6 +57,18 @@ switch (day)
                 (right: 7, down: 1),
                 (right: 1, down: 2)
             }).ToString());
+
+            break;
+        }
+    case 4:
+        {
+            var input = File.ReadAllLines(path);
+
+            // Part #1
+            Console.WriteLine(new PassportProcessing(input).AnalysePassports().ToString());
+
+            // Part #2
+            Console.WriteLine(new PassportProcessing(input).AnalysePassportsWithRules().ToString());
 
             break;
         }
