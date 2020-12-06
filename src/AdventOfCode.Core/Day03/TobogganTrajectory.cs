@@ -13,8 +13,16 @@ namespace AdventOfCode.Core.Day03
         public TobogganTrajectory(IEnumerable<string> map) => _map = map ?? throw new ArgumentNullException(nameof(map));
 
         public int AnalyseMap(int right, int down)
+            => AnalyseMapArray(right, down);
+
+        public long AnalyseMap(IReadOnlyList<(int right, int down)> slopes)
+            => slopes
+                .Select(slope => AnalyseMapArray(slope.right, slope.down))
+                .Aggregate(1L, (result, count) => result * count);
+
+        internal int AnalyseMapArray(int right, int down)
         {
-            if (down is 0) 
+            if (down is 0)
                 throw new ArgumentOutOfRangeException(nameof(down));
 
             var map = _map switch
@@ -33,14 +41,9 @@ namespace AdventOfCode.Core.Day03
             return treeCount;
         }
 
-        public long AnalyseMap(IReadOnlyList<(int right, int down)> slopes)
-         => slopes
-             .Select(slope => AnalyseMap(slope.right, slope.down))
-             .Aggregate(1L, (result, count) => result * count);
-
-        public int AnalyseMapSequence(int right, int down)
+        internal int AnalyseMapSequence(int right, int down)
         {
-            if (down is 0) 
+            if (down is 0)
                 throw new ArgumentOutOfRangeException(nameof(down));
 
             using var enumerator = _map.GetEnumerator();
@@ -67,10 +70,5 @@ namespace AdventOfCode.Core.Day03
                 return true;
             }
         }
-
-        public long AnalyseMapSequence(IReadOnlyList<(int right, int down)> slopes)
-        => slopes
-            .Select(slope => AnalyseMapSequence(slope.right, slope.down))
-            .Aggregate(1L, (result, count) => result * count);
     }
 }

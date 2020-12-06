@@ -10,77 +10,35 @@ namespace AdventOfCode.Benchmarks
     [MemoryDiagnoser]
     [NativeMemoryProfiler]
     [BenchmarkCategory("Day03")]
-    public class Day03enchmarkOps
+    public class Day03Benchmark
     {
         private TobogganTrajectory _tobogganTrajectory;
 
-        [GlobalSetup(Target = nameof(BenchmarkArray))]
+        [GlobalSetup(Targets = new[] { nameof(BenchmarkArrayAllLines), nameof(BenchmarkSequenceAllLines) })]
         public void ReadAllLines()
             => _tobogganTrajectory = new TobogganTrajectory(
                  map: File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, $"App_Data/{3.ToString("D2")}.txt")));
 
-        [GlobalSetup(Target = nameof(BenchmarkSequence))]
+        [GlobalSetup(Targets = new[] { nameof(BenchmarkArrayLines), nameof(BenchmarkSequenceLines) })]
         public void ReadLines()
           => _tobogganTrajectory = new TobogganTrajectory(
                map: File.ReadLines(Path.Combine(AppContext.BaseDirectory, $"App_Data/{3.ToString("D2")}.txt")));
 
         [Benchmark]
         [ArgumentsSource(nameof(Slopes))]
-        public long BenchmarkArray(int right, int down) => _tobogganTrajectory.AnalyseMap(right, down);
+        public long BenchmarkArrayAllLines(int right, int down) => _tobogganTrajectory.AnalyseMapArray(right, down);
 
         [Benchmark]
         [ArgumentsSource(nameof(Slopes))]
-        public long BenchmarkSequence(int right, int down) => _tobogganTrajectory.AnalyseMapSequence(right, down);
-
-        public IEnumerable<object[]> Slopes()
-        {
-            yield return new object[] { 1, 1 };
-            yield return new object[] { 3, 1 };
-            yield return new object[] { 5, 1 };
-            yield return new object[] { 7, 1 };
-            yield return new object[] { 1, 2 };
-        }
-    }
-
-    [MemoryDiagnoser]
-    [NativeMemoryProfiler]
-    [BenchmarkCategory("Day03")]
-    public class Day03enchmarkArray
-    {
-        private string[] _map;
-
-        [GlobalSetup(Target = nameof(BenchmarkArray))]
-        public void ReadAllLines()
-            => _map = File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, $"App_Data/{3.ToString("D2")}.txt"));
+        public long BenchmarkSequenceAllLines(int right, int down) => _tobogganTrajectory.AnalyseMapSequence(right, down);
 
         [Benchmark]
         [ArgumentsSource(nameof(Slopes))]
-        public long BenchmarkArray(int right, int down) => new TobogganTrajectory(_map).AnalyseMap(right, down);
-
-        public IEnumerable<object[]> Slopes()
-        {
-            yield return new object[] { 1, 1 };
-            yield return new object[] { 3, 1 };
-            yield return new object[] { 5, 1 };
-            yield return new object[] { 7, 1 };
-            yield return new object[] { 1, 2 };
-        }
-    }
-
-    [MemoryDiagnoser]
-    [NativeMemoryProfiler]
-    [BenchmarkCategory("Day03")]
-    public class Day03enchmarkSequence
-    {
-        private IEnumerable<string> _map;
-
-        [GlobalSetup(Target = nameof(BenchmarkSequence))]
-        public void ReadLines()
-          => _map = File.ReadLines(Path.Combine(AppContext.BaseDirectory, $"App_Data/{3.ToString("D2")}.txt"));
+        public long BenchmarkArrayLines(int right, int down) => _tobogganTrajectory.AnalyseMapArray(right, down);
 
         [Benchmark]
         [ArgumentsSource(nameof(Slopes))]
-        public long BenchmarkSequence(int right, int down) => new TobogganTrajectory(_map).AnalyseMapSequence(right, down);
+        public long BenchmarkSequenceLines(int right, int down) => _tobogganTrajectory.AnalyseMapSequence(right, down);
 
         public IEnumerable<object[]> Slopes()
         {
