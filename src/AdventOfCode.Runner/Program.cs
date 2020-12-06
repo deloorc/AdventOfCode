@@ -6,6 +6,7 @@ using AdventOfCode.Core.Day01;
 using AdventOfCode.Core.Day02;
 using AdventOfCode.Core.Day03;
 using AdventOfCode.Core.Day04;
+using AdventOfCode.Core.Day05;
 using Microsoft.Extensions.Configuration;
 
 var config = new ConfigurationBuilder().AddCommandLine(args, new Dictionary<string, string> { { "-d", "day" } }).Build();
@@ -69,6 +70,18 @@ switch (day)
 
             // Part #2
             Console.WriteLine(new PassportProcessing(input).AnalysePassportsWithRules().ToString());
+
+            break;
+        }
+    case 5:
+        {
+            var input = File.ReadAllLines(path);
+
+            // Part #1
+            Console.WriteLine(new BinaryBoarding(input).SearchMax().ToString());
+
+            // Part #2
+            Console.WriteLine(new BinaryBoarding(input).SearchSeat().ToString());
 
             break;
         }
