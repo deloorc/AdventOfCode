@@ -10,4 +10,8 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="AdventOfCode.Benchmarks" />
+  </ItemGroup>
+
 </Project>
