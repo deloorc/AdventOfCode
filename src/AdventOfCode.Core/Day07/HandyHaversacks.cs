@@ -17,7 +17,9 @@ namespace AdventOfCode.Core.Day07
 
         public HandyHaversacks(IEnumerable<string> rules) => _rules = rules;
 
-        public int Contains(string bag)
+        public int Contains(string bag) => SearchBag(bag);
+
+        public int Required(string bag)
         {
             return SearchBag(bag);
         }
@@ -25,10 +27,10 @@ namespace AdventOfCode.Core.Day07
         internal int SearchBag(string bag)
         {
             var graph = ProcessRules();
-            return Closure(bag,
+            return TransitiveClosure(bag,
                     b => graph.TryGetValue(b, out var childeren)
                         ? childeren
-                        : Enumerable.Empty<string>()).Count() - 1;
+                        : Enumerable.Empty<string>()).Count(b => b.Equals(bag, StringComparison.OrdinalIgnoreCase) is false);
         }
 
         private IReadOnlyDictionary<string, HashSet<string>> ProcessRules()
@@ -42,6 +44,7 @@ namespace AdventOfCode.Core.Day07
                     continue;
                 }
 
+                // NOTE: Ugly parsing, review...
                 var key = matches[0].Value;
                 foreach (var match in matches.Skip(1).Select(m => m.Groups[3].Value))
                 {
@@ -62,21 +65,24 @@ namespace AdventOfCode.Core.Day07
             return graph;
         }
 
-        public static IEnumerable<T> Closure<T>(T root, Func<T, IEnumerable<T>> children)
+        public static IEnumerable<string> TransitiveClosure(string root, Func<string, IEnumerable<string>> children)
         {
-            var seen = new HashSet<T>();
-            var stack = new Stack<T>();
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var stack = new Stack<string>();
             stack.Push(root);
 
-            while (stack.Count != 0)
+            while (stack.Count is not 0)
             {
-                T item = stack.Pop();
-                if (seen.Contains(item))
+                var bag = stack.Pop();
+                if (seen.Contains(bag))
+                {
                     continue;
+                }
 
-                seen.Add(item);
-                yield return item;
-                foreach (var child in children(item))
+                seen.Add(bag);
+
+                yield return bag;
+                foreach (var child in children(bag))
                 {
                     stack.Push(child);
                 }
