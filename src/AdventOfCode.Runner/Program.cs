@@ -106,10 +106,10 @@ switch (day)
             var input = File.ReadLines(path);
 
             // Part #1
-            Console.WriteLine(new HandyHaversacks(input).Contains("shiny gold").ToString());
+            Console.WriteLine(new HandyHaversacks(input).ContainsBag("shiny gold").ToString());
 
             // Part #2
-            Console.WriteLine(new HandyHaversacks(input).Required("shiny gold").ToString());
+            Console.WriteLine(new HandyHaversacks(input).CalculateBagContent("shiny gold").ToString());
 
             break;
         }

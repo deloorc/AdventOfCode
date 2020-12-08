@@ -2,7 +2,7 @@
   "profiles": {
     "AdventOfCode.Runner": {
       "commandName": "Project",
-      "commandLineArgs": "-d=8"
+      "commandLineArgs": "-d=9"
     }
   }
 }
