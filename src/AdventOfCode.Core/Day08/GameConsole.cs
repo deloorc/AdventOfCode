@@ -15,39 +15,37 @@ namespace AdventOfCode.Core.Day08
         public int Repair()
         {
             var program = Compile();
-            foreach (var patchedProgram in Patch(program))
+            foreach (var patched in Patch(program))
             {
-                var (local_accumulator, terminate) = Run(patchedProgram);
-                if (terminate)
-                {
-                    return local_accumulator;
-                }
+                var (accumulator, terminated) = Run(patched);
+                if (terminated)
+                    return accumulator;
             }
 
             throw new InvalidProgramException();
         }
 
-        private static (int accumulator, bool terminate) Run((OptCode optcode, int value)[] program)
+        private static (int accumulator, bool terminated) Run((OptCode optcode, int value)[] program)
         {
-            var (index, accumulator, cache) = (0, 0, new HashSet<int>());
-            while (index < program.Length || index is < 0)
+            var (pointer, accumulator, cache) = (0, 0, new HashSet<int>());
+            while (pointer < program.Length || pointer is < 0)
             {
-                if (cache.Add(index) is false)
+                if (cache.Add(pointer) is false)
                     break;
 
-                var (optcode, value) = program[index];
+                var (optcode, value) = program[pointer];
                 switch (optcode)
                 {
-                    case OptCode.Jmp: index += value; continue;
+                    case OptCode.Jmp: pointer += value; continue;
                     case OptCode.Acc: accumulator += value; break;
                     case OptCode.Nop:
                     default: break;
                 }
 
-                index++;
+                pointer++;
             }
 
-            return (accumulator, index == program.Length);
+            return (accumulator, terminated: pointer == program.Length);
         }
 
         private static IEnumerable<(OptCode optcode, int value)[]> Patch((OptCode optcode, int value)[] program)
@@ -58,8 +56,7 @@ namespace AdventOfCode.Core.Day08
                     continue;
 
                 // NOTE: Generate the program so that it terminates normally by changing exactly one jmp (to nop) or nop (to jmp).
-                //       Only change the current programm line to generate every possible 'patched' program to find 
-                //       the correct solution.
+                //       Only change the current code line to generate every possible 'patched' program to find the correct solution.
                 yield return program
                     .Select((instruction, p) => p != pointer
                         ? instruction
@@ -75,7 +72,7 @@ namespace AdventOfCode.Core.Day08
 
         private (OptCode optcode, int value)[] Compile()
         {
-            var operations = _codeFile switch
+            var instructions = _codeFile switch
             {
                 string[] a => new List<(OptCode, int)>(a.Length),
                 ICollection<string> c => new List<(OptCode, int)>(c.Count),
@@ -85,12 +82,12 @@ namespace AdventOfCode.Core.Day08
             foreach (var line in _codeFile)
             {
                 var instruction = line.Split(' ', StringSplitOptions.TrimEntries);
-                operations.Add((
-                    Enum.Parse<OptCode>(instruction[0], true),
+                instructions.Add((
+                    Enum.Parse<OptCode>(instruction[0], ignoreCase: true),
                     int.Parse(instruction[1])));
             }
 
-            return operations.ToArray();
+            return instructions.ToArray();
         }
 
         private enum OptCode
