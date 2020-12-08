@@ -9,7 +9,6 @@ namespace AdventOfCode.Benchmarks
 {
     [MemoryDiagnoser]
     [NativeMemoryProfiler]
-    [BenchmarkCategory("Day03")]
     public class Day03Benchmark
     {
         private TobogganTrajectory _tobogganTrajectory;
