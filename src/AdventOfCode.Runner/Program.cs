@@ -106,8 +106,8 @@ switch (day)
             // Part #1
             Console.WriteLine(new HandyHaversacks(input).Contains("shiny gold").ToString());
 
-            //// Part #2
-            //Console.WriteLine(new TobogganCustoms(input).AnalyseGroupAnswers().ToString());
+            // Part #2
+            Console.WriteLine(new HandyHaversacks(input).Required("shiny gold").ToString());
 
             break;
         }

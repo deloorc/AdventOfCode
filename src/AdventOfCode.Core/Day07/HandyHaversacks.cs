@@ -11,7 +11,7 @@ namespace AdventOfCode.Core.Day07
         /// Assumption is that the color is always 2 words. [a-z]+ [a-z]+ will search for "word <space> word"
         /// </remarks>
         private static readonly Regex _bagPattern =
-            new Regex(@"(^[a-z]+ [a-z]+)|(\d+) ([a-z]+ [a-z]+)", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+            new Regex(@"(^\w+ \w+)|(\d+) (\w+ \w+)", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
         private readonly IEnumerable<string> _rules;
 
@@ -19,21 +19,43 @@ namespace AdventOfCode.Core.Day07
 
         public int Contains(string bag) => SearchBag(bag);
 
-        public int Required(string bag)
+        public long Required(string bag)
         {
-            return SearchBag(bag);
+            return SearchRequiredBag(bag);
         }
 
         internal int SearchBag(string bag)
         {
-            var graph = ProcessRules();
+            var graph = ProcessRulesInverse();
             return TransitiveClosure(bag,
                     b => graph.TryGetValue(b, out var childeren)
                         ? childeren
                         : Enumerable.Empty<string>()).Count(b => b.Equals(bag, StringComparison.OrdinalIgnoreCase) is false);
         }
 
-        private IReadOnlyDictionary<string, HashSet<string>> ProcessRules()
+        internal long SearchRequiredBag(string bag)
+        {
+            var graph = ProcessRules();
+            return CountRecurssion(bag) - 1;
+
+            long CountRecurssion(string bag)
+            {
+                IEnumerable<long> enumerable()
+                {
+                    if (graph.TryGetValue(bag, out var bags))
+                    {
+                        foreach (var child in bags)
+                        {
+                            yield return child.Item1 * CountRecurssion(child.Item2);
+                        }
+                    }
+                }
+
+                return 1 + enumerable().Sum();
+            }
+        }
+
+        private IReadOnlyDictionary<string, HashSet<string>> ProcessRulesInverse()
         {
             var graph = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
             foreach (var rule in _rules)
@@ -60,6 +82,30 @@ namespace AdventOfCode.Core.Day07
                         };
                     }
                 }
+            }
+
+            return graph;
+        }
+
+        private IReadOnlyDictionary<string, List<(int, string)>> ProcessRules()
+        {
+            var graph = new Dictionary<string, List<(int, string)>>(StringComparer.OrdinalIgnoreCase);
+            foreach (var rule in _rules)
+            {
+                var matches = _bagPattern.Matches(rule);
+                if (matches.Count is not > 1)
+                {
+                    continue;
+                }
+
+                // NOTE: Ugly parsing, review...
+                var bags = new List<(int, string)>(matches.Count - 1);
+                foreach (var match in matches.Skip(1))
+                {
+                    bags.Add((int.Parse(match.Groups[2].Value), match.Groups[3].Value));
+                }
+
+                graph[matches[0].Value] = bags;
             }
 
             return graph;
