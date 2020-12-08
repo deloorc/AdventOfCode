@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using AdventOfCode.Core.Day01;
@@ -117,10 +118,10 @@ switch (day)
             var input = File.ReadLines(path);
 
             // Part #1
-            Console.WriteLine(new GameConsole(input).ToString());
+            Console.WriteLine(new GameConsole(input).Boot().ToString());
 
             // Part #2
-            //Console.WriteLine(new GameConsole(input).ToString());
+            Console.WriteLine(new GameConsole(input).Repair().ToString());
 
             break;
         }

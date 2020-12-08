@@ -29,5 +29,29 @@ namespace AdventOfCode.UnitTest.Day08
             // Assert
             Assert.AreEqual(expected, accumulator);
         }
+
+        [DataTestMethod]
+        [DataRow(new[] {
+            "nop +0",
+            "acc +1",
+            "jmp +4",
+            "acc +3",
+            "jmp -3",
+            "acc -99",
+            "acc +1",
+            "jmp -4",
+            "acc +6"
+        }, 8)]
+        public void ExamplePartTwo(string[] input, int expected)
+        {
+            // Arrange
+            var gameConsole = new GameConsole(input);
+
+            // Act
+            var accumulator = gameConsole.Repair();
+
+            // Assert
+            Assert.AreEqual(expected, accumulator);
+        }
     }
 }
