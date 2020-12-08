@@ -12,9 +12,39 @@ namespace AdventOfCode.Core.Day08
 
         public int Boot() => Run(Compile()).accumulator;
 
-        public int Repair()
+        public int Repair() => RepairWithInlinePatch(Compile());
+
+        internal static int RepairWithInlinePatch((OptCode optcode, int value)[] program)
         {
-            var program = Compile();
+            for (var pointer = 0; pointer < program.Length; pointer++)
+            {
+                var instruction = program[pointer];
+                if (instruction.optcode is OptCode.Acc)
+                    continue;
+
+                // Patch the current instruction.
+                program[pointer] = Swap(instruction);
+
+                var (accumulator, terminated) = Run(program);
+                if (terminated)
+                    return accumulator;
+
+                // Since our 'patch' is a simple swap we can repeat the process to restore the original instruction.
+                program[pointer] = Swap(program[pointer]);
+            }
+
+            throw new InvalidProgramException();
+
+            static (OptCode optcode, int value) Swap((OptCode optcode, int value) instruction) => instruction.optcode switch
+            {
+                OptCode.Jmp => (OptCode.Nop, instruction.value),
+                OptCode.Nop => (OptCode.Jmp, instruction.value),
+                _ => throw new InvalidProgramException()
+            };
+        }
+
+        internal static int RepairWithBruteForce((OptCode optcode, int value)[] program)
+        {
             foreach (var patched in Patch(program))
             {
                 var (accumulator, terminated) = Run(patched);
@@ -23,6 +53,28 @@ namespace AdventOfCode.Core.Day08
             }
 
             throw new InvalidProgramException();
+
+            static IEnumerable<(OptCode optcode, int value)[]> Patch((OptCode optcode, int value)[] program)
+            {
+                for (var pointer = 0; pointer < program.Length; pointer++)
+                {
+                    if (program[pointer].optcode is OptCode.Acc)
+                        continue;
+
+                    // NOTE: Generate the program so that it terminates normally by changing exactly one jmp (to nop) or nop (to jmp).
+                    //       Only change the current code line to generate every possible 'patched' program to find the correct solution.
+                    yield return program
+                        .Select((instruction, p) => p != pointer
+                            ? instruction
+                            : instruction.optcode switch
+                            {
+                                OptCode.Jmp => (OptCode.Nop, instruction.value),
+                                OptCode.Nop => (OptCode.Jmp, instruction.value),
+                                _ => throw new InvalidProgramException()
+                            })
+                        .ToArray();
+                }
+            }
         }
 
         private static (int accumulator, bool terminated) Run((OptCode optcode, int value)[] program)
@@ -48,29 +100,7 @@ namespace AdventOfCode.Core.Day08
             return (accumulator, terminated: pointer == program.Length);
         }
 
-        private static IEnumerable<(OptCode optcode, int value)[]> Patch((OptCode optcode, int value)[] program)
-        {
-            for (var pointer = 0; pointer < program.Length; pointer++)
-            {
-                if (program[pointer].optcode is OptCode.Acc)
-                    continue;
-
-                // NOTE: Generate the program so that it terminates normally by changing exactly one jmp (to nop) or nop (to jmp).
-                //       Only change the current code line to generate every possible 'patched' program to find the correct solution.
-                yield return program
-                    .Select((instruction, p) => p != pointer
-                        ? instruction
-                        : instruction.optcode switch
-                        {
-                            OptCode.Jmp => (OptCode.Nop, instruction.value),
-                            OptCode.Nop => (OptCode.Jmp, instruction.value),
-                            _ => throw new InvalidProgramException()
-                        })
-                    .ToArray();
-            }
-        }
-
-        private (OptCode optcode, int value)[] Compile()
+        internal (OptCode optcode, int value)[] Compile()
         {
             var instructions = _codeFile switch
             {
@@ -90,7 +120,7 @@ namespace AdventOfCode.Core.Day08
             return instructions.ToArray();
         }
 
-        private enum OptCode
+        internal enum OptCode
         {
             Jmp,
             Acc,
