@@ -130,10 +130,10 @@ switch (day)
             var input = File.ReadLines(path);
 
             // Part #1
-            //Console.WriteLine(new GameConsole(input).Boot().ToString());
+            Console.WriteLine(new EncodingError(input).Preamble(25).ToString());
 
             // Part #2
-            //Console.WriteLine(new GameConsole(input).Repair().ToString());
+            Console.WriteLine(new EncodingError(input).Contiguous(25).ToString());
 
             break;
         }
