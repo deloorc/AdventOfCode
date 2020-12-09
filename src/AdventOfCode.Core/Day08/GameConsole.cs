@@ -22,14 +22,14 @@ namespace AdventOfCode.Core.Day08
                 if (instruction.optcode is OptCode.Acc)
                     continue;
 
-                // Patch the current instruction.
+                // NOTE: Patch the current instruction.
                 program[pointer] = Swap(instruction);
 
                 var (accumulator, terminated) = Run(program);
                 if (terminated)
                     return accumulator;
 
-                // Since our 'patch' is a simple swap we can repeat the process to restore the original instruction.
+                // NOTE: Since our 'patch' is a simple swap we can repeat the process to restore the original instruction.
                 program[pointer] = Swap(program[pointer]);
             }
 
