@@ -1,76 +1,112 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System;
 
 namespace AdventOfCode.Core.Day09
 {
     public class EncodingError
     {
-        private readonly IEnumerable<string> _input;
+        private readonly long[] _sequence;
 
-        public EncodingError(IEnumerable<string> input) => _input = input;
+        public EncodingError(IEnumerable<string> input)
+            => _sequence = input.Select(long.Parse).ToArray();
 
-        public long Preamble(int length)
+        public long Preamble(int length) => FindError(length);
+
+        public long Contiguous(int length) => FindContiguous(FindError(length));
+
+        internal long FindError(int length)
         {
-            var numbers = _input.Select(s => long.Parse(s)).ToArray();
-            return FindError(length, numbers);
+            var terms = new Queue<long>(length);
+            foreach (var term in _sequence)
+            {
+                // NOTE: Fill the intial queue with the first preamble length before we begin to calculate the sumations.
+                if (length is not 0 and not < 0)
+                {
+                    terms.Enqueue(term);
+                    length--;
+                    continue;
+                }
+
+                var sumFound = false;
+                foreach (var n in terms)
+                {
+                    // NOTE: Skip the n terms that are higher of the given sum result.
+                    if (term < n) continue;
+                    if (terms.Contains(term - n))
+                    {
+                        terms.Dequeue();
+                        terms.Enqueue(term);
+                        sumFound = true;
+
+                        break;
+                    }
+                }
+
+                if (sumFound is false)
+                    return term;
+            }
+
+            throw new InvalidProgramException();
         }
 
-        public long Contiguous(int length)
+        internal long FindErrorWithCache(int length)
         {
-            var numbers = _input.Select(s => long.Parse(s)).ToArray();
-            var error = FindError(length, numbers);
-
-            for (int index = 0; index < numbers.Length; index++)
+            var (terms, cache) = (new Queue<long>(length), new HashSet<long>(length));
+            foreach (var term in _sequence)
             {
-                var current = numbers[index];
-
-                for (int next = index + 1; next < numbers.Length - index + 1; next++)
+                // NOTE: Fill the intial queue with the first preamble length before we begin to calculate the sumations.
+                if (length is not 0 and not < 0)
                 {
-                    current += numbers[next];
-                    if (current > error)
+                    terms.Enqueue(term);
+                    cache.Add(term);
+                    length--;
+                    continue;
+                }
+
+                var sumFound = false;
+                foreach (var n in terms)
+                {
+                    // NOTE: Skip the n terms that are higher of the given sum result.
+                    if (term < n) continue;
+                    if (cache.Contains(term - n))
+                    {
+                        cache.Remove(terms.Dequeue());
+                        terms.Enqueue(term);
+                        cache.Add(term);
+                        sumFound = true;
+
+                        break;
+                    }
+                }
+
+                if (sumFound is false)
+                    return term;
+            }
+
+            throw new InvalidProgramException();
+        }
+
+        internal long FindContiguous(long sum)
+        {
+            for (int index = 0; index < _sequence.Length; index++)
+            {
+                var current = _sequence[index];
+                for (int increment = index + 1; increment < _sequence.Length - index + 1; increment++)
+                {
+                    current += _sequence[increment];
+                    if (current > sum)
                         break;
 
-                    if (current == error)
+                    if (current == sum)
                     {
-                        var (min, max) = numbers[index..(next + 1)]
+                        var (min, max) = _sequence[index..(increment + 1)]
                             .Aggregate(
                                 seed: (min: long.MaxValue, max: long.MinValue),
                                 func: (r, n) => (min: Math.Min(r.min, n), max: Math.Max(r.max, n)));
 
                         return min + max;
                     }
-                }
-            }
-
-            throw new InvalidProgramException();
-        }
-
-        internal static long FindError(int preambleLength, long[] sequence)
-        {
-            for (int i = sequence.Length - 1; i >= 0; i--)
-            {
-                var n = sequence[i];
-                var k = new HashSet<long>();
-                var o = new HashSet<long>();
-
-                for (int j = 1; j <= preambleLength; j++)
-                {
-                    var m = i - j;
-                    if (m is < 0)
-                    {
-                        break;
-                    }
-
-                    var x = sequence[m];
-                    o.Add(x);
-                    k.Add(n - x);
-                }
-
-                o.IntersectWith(k);
-                if (o.Count is 0)
-                {
-                    return n;
                 }
             }
 
