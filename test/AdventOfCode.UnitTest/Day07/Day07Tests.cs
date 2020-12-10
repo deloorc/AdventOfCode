@@ -21,10 +21,10 @@ namespace AdventOfCode.UnitTest.Day07
         public void ExamplePartOne(string[] input, string bag, int expected)
         {
             // Arrange
-            var luggage = new HandyHaversacks(input);
+            var bags = new HandyHaversacks(input);
 
             // Act
-            var sum = luggage.Contains(bag);
+            var sum = bags.ContainsBag(bag);
 
             // Assert
             Assert.AreEqual(expected, sum);
@@ -54,10 +54,10 @@ namespace AdventOfCode.UnitTest.Day07
         public void ExamplePartTwo(string[] input, string bag, int expected)
         {
             // Arrange
-            var luggage = new HandyHaversacks(input);
+            var bags = new HandyHaversacks(input);
 
             // Act
-            var sum = luggage.Required(bag);
+            var sum = bags.CalculateBagContent(bag);
 
             // Assert
             Assert.AreEqual(expected, sum);

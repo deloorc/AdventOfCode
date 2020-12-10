@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using AdventOfCode.Core.Day01;
@@ -11,6 +10,7 @@ using AdventOfCode.Core.Day05;
 using AdventOfCode.Core.Day06;
 using AdventOfCode.Core.Day07;
 using AdventOfCode.Core.Day08;
+using AdventOfCode.Core.Day09;
 using Microsoft.Extensions.Configuration;
 
 var config = new ConfigurationBuilder().AddCommandLine(args, new Dictionary<string, string> { { "-d", "day" } }).Build();
@@ -106,10 +106,10 @@ switch (day)
             var input = File.ReadLines(path);
 
             // Part #1
-            Console.WriteLine(new HandyHaversacks(input).Contains("shiny gold").ToString());
+            Console.WriteLine(new HandyHaversacks(input).ContainsBag("shiny gold").ToString());
 
             // Part #2
-            Console.WriteLine(new HandyHaversacks(input).Required("shiny gold").ToString());
+            Console.WriteLine(new HandyHaversacks(input).CalculateBagContent("shiny gold").ToString());
 
             break;
         }
@@ -122,6 +122,18 @@ switch (day)
 
             // Part #2
             Console.WriteLine(new GameConsole(input).Repair().ToString());
+
+            break;
+        }
+    case 9:
+        {
+            var input = File.ReadLines(path);
+
+            // Part #1
+            Console.WriteLine(new EncodingError(input).Preamble(25).ToString());
+
+            // Part #2
+            Console.WriteLine(new EncodingError(input).Contiguous(25).ToString());
 
             break;
         }
