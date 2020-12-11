@@ -11,6 +11,7 @@ using AdventOfCode.Core.Day06;
 using AdventOfCode.Core.Day07;
 using AdventOfCode.Core.Day08;
 using AdventOfCode.Core.Day09;
+using AdventOfCode.Core.Day10;
 using Microsoft.Extensions.Configuration;
 
 var config = new ConfigurationBuilder().AddCommandLine(args, new Dictionary<string, string> { { "-d", "day" } }).Build();
@@ -134,6 +135,18 @@ switch (day)
 
             // Part #2
             Console.WriteLine(new EncodingError(input).Contiguous(25).ToString());
+
+            break;
+        }
+    case 10:
+        {
+            var input = File.ReadLines(path);
+
+            // Part #1
+            Console.WriteLine(new AdapterArray(input).CalculateJoltsDifference().ToString());
+
+            // Part #2
+            Console.WriteLine(new AdapterArray(input).CalculateArrangements().ToString());
 
             break;
         }
