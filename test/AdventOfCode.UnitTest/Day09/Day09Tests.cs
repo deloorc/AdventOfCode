@@ -40,6 +40,7 @@ namespace AdventOfCode.UnitTest.Day09
             // Assert
             Assert.AreEqual(expected, result);
         }
+
         [DataTestMethod]
         [DataRow(new[] {
            "35",

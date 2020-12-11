@@ -16,10 +16,10 @@ namespace AdventOfCode.Benchmarks
         public void Setup()
             => _program = new EncodingError(File.ReadLines(Path.Combine(AppContext.BaseDirectory, $"App_Data/{9.ToString("D2")}.txt")));
 
-        [Benchmark()]
+        [Benchmark]
         public long BenchmarkFindErrorWithCache() => _program.FindErrorWithCache(25);
 
-        [Benchmark(Baseline = true)]
+        [Benchmark]
         public long BenchmarkFindError() => _program.FindError(25);
     }
 }
