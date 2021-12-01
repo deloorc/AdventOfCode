@@ -17,7 +17,14 @@ switch (day)
 {
     case 1:
         {
-          
+            var input = File.ReadAllLines(path).Select(s => int.Parse(s)).ToArray();
+
+            // Part #1
+            Console.WriteLine(SonarSweep.ReportIncrease(input).ToString());
+
+            // Part #2
+            Console.WriteLine(SonarSweep.ReportThreeMeasurementIncrease(input).ToString());
+            break;
         }
     default:
         break;
