@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using AdventOfCode.Core.Day01;
+using AdventOfCode.Core.Day02;
 using Microsoft.Extensions.Configuration;
 
 var config = new ConfigurationBuilder().AddCommandLine(args, new Dictionary<string, string> { { "-d", "day" } }).Build();
@@ -24,6 +25,17 @@ switch (day)
 
             // Part #2
             Console.WriteLine(SonarSweep.ReportThreeMeasurementIncrease(input).ToString());
+            break;
+        }
+    case 2:
+        {
+            var input = File.ReadAllLines(path);
+
+            // Part #1
+            Console.WriteLine(Submarine.Dive(input).ToString());
+
+            // Part #2
+            Console.WriteLine(Submarine.DiveWithAim(input).ToString());
             break;
         }
     default:
